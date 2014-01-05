@@ -1,0 +1,15 @@
+*swp
+*iml
+build
+.idea
+.gradle
+*.properties
+*lst
+lib/dbaccessor.jar
+lib/svnaccessor.jar
+lib/xlsaccessor.jar
+lib/cassandra-accessor.jar
+workspace
+attr
+const
+output
