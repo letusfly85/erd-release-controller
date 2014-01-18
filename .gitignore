@@ -13,3 +13,4 @@ workspace
 attr
 const
 output
+erd.release.control.properties

@@ -27,4 +27,21 @@ dependencies {
     runtime     files('lib/ojdbc14.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    testCompile files('lib/dbunit-2.4.9.jar')
+
+    testCompile 'org.slf4j:slf4j-log4j12:1.5.6'
+
+    testCompile 'org.slf4j:slf4j-api:1.5.6'
+
+    testCompile 'org.slf4j:jcl-over-slf4j:1.5.6'
+
+    runtime     'org.apache.poi:poi:3.8'
+
+    runtime     'org.apache.poi:poi-ooxml:3.8'
+}
+
+test {
+    systemProperty "app.env.name",      "development"
+    systemProperty "environment",       "unit-test"
 }
