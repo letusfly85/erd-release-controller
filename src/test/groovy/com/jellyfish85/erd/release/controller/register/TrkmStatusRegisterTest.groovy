@@ -16,6 +16,8 @@ import org.dbunit.database.IDatabaseConnection
 import org.dbunit.dataset.IDataSet
 import org.dbunit.dataset.excel.XlsDataSet
 
+import java.sql.SQLException
+
 class TrkmStatusRegisterTest extends GroovyTestCase {
 
     String       environment    = null
@@ -25,6 +27,7 @@ class TrkmStatusRegisterTest extends GroovyTestCase {
     KrTrkmStatusDao dao         = null
 
     String       schemaName     = ""
+    IDatabaseConnection iConn   = null
 
     TrkmStatusRegister register = null
 
@@ -42,13 +45,7 @@ class TrkmStatusRegisterTest extends GroovyTestCase {
         DatabaseMetaData metaData = conn.getMetaData()
         schemaName  = metaData.getUserName()
 
-        IDatabaseConnection iConn   = new DatabaseConnection(conn, schemaName)
-        String url                   = "/excel/KR_TRKM_STATUS.xls"
-        File file                    = new File(getClass().getResource(url).toURI())
-        FileInputStream inputStream  = new FileInputStream(file)
-        IDataSet partialDataSet      = new XlsDataSet(inputStream)
-
-        DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+        iConn   = new DatabaseConnection(conn, schemaName)
     }
 
     void testSchema() {
@@ -56,11 +53,44 @@ class TrkmStatusRegisterTest extends GroovyTestCase {
                 context.erdProp.erdSchemaNameAdminUnitTest(), schemaName)
     }
 
-    void testRegister() {
+    void testRegister01() {
+        String url                   = "/excel/KR_TRKM_STATUS_01.xls"
+        File file                    = new File(getClass().getResource(url).toURI())
+        FileInputStream inputStream  = new FileInputStream(file)
+        IDataSet partialDataSet      = new XlsDataSet(inputStream)
+
+        DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+
         register.register()
 
         KrTrkmStatusBean bean = dao.findCurrent(conn)
 
         assertEquals("trkm id should be updated", new BigDecimal(2843), bean.trkmIdAttr().value())
+    }
+
+    void testRegister02() {
+        String url                   = "/excel/KR_TRKM_STATUS_02.xls"
+        File file                    = new File(getClass().getResource(url).toURI())
+        FileInputStream inputStream  = new FileInputStream(file)
+        IDataSet partialDataSet      = new XlsDataSet(inputStream)
+
+        DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+
+        register.register()
+
+        KrTrkmStatusBean bean = dao.findCurrent(conn)
+
+        assertEquals("trkm id should not be updated", new BigDecimal(2842), bean.trkmIdAttr().value())
+    }
+
+    void testRegisterErr01() {
+        String url                   = "/excel/KR_TRKM_STATUS_ERR_01.xls"
+        File file                    = new File(getClass().getResource(url).toURI())
+        FileInputStream inputStream  = new FileInputStream(file)
+        IDataSet partialDataSet      = new XlsDataSet(inputStream)
+
+        DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+
+        shouldFail(RuntimeException) {register.register()}
     }
 }
