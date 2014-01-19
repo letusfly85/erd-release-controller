@@ -104,7 +104,7 @@ class ErdReleaseRegister extends ErdRegister {
     }
 
     public void register() {
-
+        //todo refresh ms and rr erd release table
     }
 
 }
