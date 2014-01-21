@@ -1,9 +1,12 @@
 package com.jellyfish85.erd.release.controller.register
 
+import com.jellyfish85.dbaccessor.bean.erd.mainte.tool.MsErdReleasesBean
 import com.jellyfish85.dbaccessor.bean.erd.mainte.tool.MsTablesBean
+import com.jellyfish85.dbaccessor.bean.erd.mainte.tool.RrErdReleasesBean
 import com.jellyfish85.dbaccessor.bean.erd.release.controller.TpTicketNumbers4releaseBean
 import com.jellyfish85.dbaccessor.dao.erd.mainte.tool.MsErdReleasesDao
 import com.jellyfish85.dbaccessor.dao.erd.mainte.tool.MsTablesDao
+import com.jellyfish85.dbaccessor.dao.erd.mainte.tool.RrErdReleasesDao
 import com.jellyfish85.dbaccessor.dao.erd.release.controller.KrTrkmStatusDao
 import com.jellyfish85.dbaccessor.dao.erd.release.controller.TpTicketNumbers4releaseDao
 import com.jellyfish85.dbaccessor.manager.DatabaseManager
@@ -21,7 +24,8 @@ class ErdReleaseRegister extends ErdRegister {
     private TpTicketNumbers4releaseDao tpDao  = null
     private KrTrkmStatusDao            krDao  = null
     private MsTablesDao                tblDao = null
-    private MsErdReleasesDao           erdDao = null
+    private MsErdReleasesDao           curDao = null
+    private RrErdReleasesDao           hstDao = null
 
 
     private BaseContext context = null
@@ -35,7 +39,8 @@ class ErdReleaseRegister extends ErdRegister {
         tpDao   = new TpTicketNumbers4releaseDao()
         krDao   = new KrTrkmStatusDao()
         tblDao  = new MsTablesDao()
-        erdDao  = new MsErdReleasesDao()
+        curDao  = new MsErdReleasesDao()
+        hstDao  = new RrErdReleasesDao()
     }
 
     private BigDecimal curReleaseId = null
@@ -80,8 +85,11 @@ class ErdReleaseRegister extends ErdRegister {
 
     public void prepareErdRelease() throws SQLException {
 
-        BigDecimal preReleaseId = erdDao.findMaxReleaseId(this.conn)
+        BigDecimal preReleaseId = curDao.findMaxReleaseId(this.conn)
         BigDecimal curReleaseId = preReleaseId + new BigDecimal(1)
+
+        setPreReleaseId(preReleaseId)
+        setCurReleaseId(curReleaseId)
 
         ArrayList<MsTablesBean> beans = generateTarget()
         if (ArrayUtils.isEmpty(beans)) {
@@ -103,8 +111,38 @@ class ErdReleaseRegister extends ErdRegister {
         this.manager.jCommit()
     }
 
-    public void register() {
-        //todo refresh ms and rr erd release table
+    public void executeErdRelease() {
+        hstDao.updateByReleaseIds(this.conn, this.preReleaseId, this.curReleaseId)
+
+        curDao.deleteAll(this.conn)
+
+        ArrayList<MsErdReleasesBean> targets = curDao.findTargetFromTemporary(this.conn, this.curReleaseId)
+        targets = curDao.convert(targets)
+        curDao.insert(this.conn, targets)
+
+        ArrayList<RrErdReleasesBean> hstTargets = new ArrayList<>()
+        targets.each {MsErdReleasesBean bean ->
+            RrErdReleasesBean hstBean = new RrErdReleasesBean()
+
+            hstBean.afReleaseIdAttr().setValue(new BigDecimal(9999999999L))
+            hstBean.bfReleaseIdAttr().setValue(bean.releaseIdAttr().value())
+            hstBean.diffTypeAttr().setValue(bean.diffTypeAttr().value())
+            hstBean.objectIdAttr().setValue(bean.objectIdAttr().value())
+            hstBean.objectNameAttr().setValue(bean.objectNameAttr().value())
+            hstBean.objectTypeAttr().setValue(bean.objectTypeAttr().value())
+            hstBean.revisionAttr().setValue(bean.revisionAttr().value())
+
+            hstTargets.add(hstBean)
+        }
+        hstDao.insert(this.conn, hstTargets)
+
+        curDao.insertFromHst(this.conn, curReleaseId)
+        hstDao.insertFromCur(this.conn, curReleaseId)
     }
 
+    public void register() {
+        prepareErdRelease()
+
+        executeErdRelease()
+    }
 }
