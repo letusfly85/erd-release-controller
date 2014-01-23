@@ -141,8 +141,10 @@ class ErdReleaseRegister extends ErdRegister {
     }
 
     public void register() {
+        // specify targets
         prepareErdRelease()
 
+        // release targets
         executeErdRelease()
     }
 }
