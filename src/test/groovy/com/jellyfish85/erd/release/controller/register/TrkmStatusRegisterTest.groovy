@@ -60,6 +60,7 @@ class TrkmStatusRegisterTest extends GroovyTestCase {
         IDataSet partialDataSet      = new XlsDataSet(inputStream)
 
         DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+        conn.commit()
 
         register.register()
 
@@ -75,6 +76,7 @@ class TrkmStatusRegisterTest extends GroovyTestCase {
         IDataSet partialDataSet      = new XlsDataSet(inputStream)
 
         DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+        conn.commit()
 
         register.register()
 
@@ -90,6 +92,7 @@ class TrkmStatusRegisterTest extends GroovyTestCase {
         IDataSet partialDataSet      = new XlsDataSet(inputStream)
 
         DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+        conn.commit()
 
         shouldFail(RuntimeException) {register.register()}
     }
