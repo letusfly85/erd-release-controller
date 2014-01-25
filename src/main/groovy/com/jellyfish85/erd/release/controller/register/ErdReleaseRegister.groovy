@@ -54,14 +54,14 @@ class ErdReleaseRegister extends ErdRegister {
         this.preReleaseId = _releaseId
     }
 
-    public ArrayList<TpTicketNumbers4releaseBean> generateTarget() {
-        ArrayList<TpTicketNumbers4releaseBean> beans = new ArrayList<>()
+    public ArrayList<MsTablesBean> generateTarget() {
+        ArrayList<MsTablesBean> beans = new ArrayList<>()
 
-        // find pre trkm id from TP_TICKETNUMBERS4RELEASE
+        // find pre trkm id from TP_TICKET_NUMBERS4RELEASE
         BigDecimal preTrkmId = tpDao.findMaxTrkmId(this.conn)
 
         // find current trkm id from KR_TRKM_STATUS
-        BigDecimal curTrkmId = krDao.findCurrent(this.conn)
+        BigDecimal curTrkmId = krDao.findCurrent(this.conn).trkmIdAttr().value()
 
         // if there is no changes between both ids, return empty list with a message
         if (preTrkmId >= curTrkmId) {
