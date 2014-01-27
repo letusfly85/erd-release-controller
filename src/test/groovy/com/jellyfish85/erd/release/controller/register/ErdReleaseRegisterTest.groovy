@@ -1,12 +1,15 @@
 package com.jellyfish85.erd.release.controller.register
 
 import com.jellyfish85.dbaccessor.bean.erd.mainte.tool.MsTablesBean
+import com.jellyfish85.dbaccessor.bean.erd.mainte.tool.RrErdReleasesBean
 import com.jellyfish85.dbaccessor.bean.erd.release.controller.TpTicketNumbers4releaseBean
+import com.jellyfish85.dbaccessor.dao.erd.mainte.tool.RrErdReleasesDao
 import com.jellyfish85.dbaccessor.dao.erd.release.controller.TpTicketNumbers4releaseDao
 import com.jellyfish85.dbaccessor.manager.DatabaseManager
 import com.jellyfish85.erd.release.controller.BaseContext
 import org.dbunit.operation.DatabaseOperation
 import org.junit.AfterClass
+import org.junit.Before
 import org.junit.BeforeClass
 
 import java.sql.Connection
@@ -28,8 +31,6 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
     String       schemaName     = ""
     IDatabaseConnection iConn   = null
 
-
-    @BeforeClass
     void setUp() {
         environment = System.getProperty("environment")
 
@@ -58,7 +59,6 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
         DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
         conn.commit()
 
-
         url                   = "/excel/MS_TABLES_01.xls"
         file                    = new File(getClass().getResource(url).toURI())
         inputStream  = new FileInputStream(file)
@@ -67,6 +67,13 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
         conn.commit()
 
         url                   = "/excel/MS_ERD_RELEASES_01.xls"
+        file                    = new File(getClass().getResource(url).toURI())
+        inputStream  = new FileInputStream(file)
+        partialDataSet      = new XlsDataSet(inputStream)
+        DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+        conn.commit()
+
+        url                   = "/excel/RR_ERD_RELEASES_01.xls"
         file                    = new File(getClass().getResource(url).toURI())
         inputStream  = new FileInputStream(file)
         partialDataSet      = new XlsDataSet(inputStream)
@@ -104,11 +111,26 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
                 (new BigDecimal(33574)), list.head().ticketNumberAttr().value())
     }
 
-    /*
     void testExecuteErdRelease() {
 
+        register.prepareErdRelease()
+
+        register.executeErdRelease()
+
+        RrErdReleasesDao  hstDao  = new RrErdReleasesDao()
+        RrErdReleasesBean hstBean = new RrErdReleasesBean()
+        hstBean.afReleaseIdAttr().setValue(new BigDecimal(9999999999L))
+        hstBean.objectTypeAttr().setValue("TABLE")
+        hstBean.objectNameAttr().setValue("a")
+
+        def _result = hstDao.find(this.conn, hstBean)
+        ArrayList<RrErdReleasesBean> result = hstDao.convert(_result)
+
+        assertEquals("history release id should be 306",
+                (new BigDecimal(306)), result.head().bfReleaseIdAttr().value() )
     }
 
+    /*
     void testRegister() {
 
     }

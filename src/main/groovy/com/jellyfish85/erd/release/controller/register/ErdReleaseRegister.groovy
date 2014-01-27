@@ -114,12 +114,19 @@ class ErdReleaseRegister extends ErdRegister {
     }
 
     public void executeErdRelease() {
-        hstDao.updateByReleaseIds(this.conn, this.preReleaseId, this.curReleaseId)
+        BigDecimal wherePreReleaseId = this.preReleaseId
+        BigDecimal whereCurReleaseId = new BigDecimal(9999999999L)
 
+        println(this.preReleaseId + "\t" + this.curReleaseId + "\t" + wherePreReleaseId + "\t" + whereCurReleaseId)
+
+        hstDao.updateByReleaseIds(this.conn,
+                this.preReleaseId, this.curReleaseId,
+                wherePreReleaseId, whereCurReleaseId
+            )
+
+        def _targets = curDao.findTargetFromTemporary(this.conn, this.curReleaseId)
+        ArrayList<MsErdReleasesBean> targets = curDao.convert(_targets)
         curDao.deleteAll(this.conn)
-
-        ArrayList<MsErdReleasesBean> targets = curDao.findTargetFromTemporary(this.conn, this.curReleaseId)
-        targets = curDao.convert(targets)
         curDao.insert(this.conn, targets)
 
         ArrayList<RrErdReleasesBean> hstTargets = new ArrayList<>()
@@ -140,6 +147,8 @@ class ErdReleaseRegister extends ErdRegister {
 
         curDao.insertFromHst(this.conn, curReleaseId)
         hstDao.insertFromCur(this.conn, curReleaseId)
+
+        this.conn.commit()
     }
 
     public void register() {
