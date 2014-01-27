@@ -1,6 +1,8 @@
 package com.jellyfish85.erd.release.controller.register
 
 import com.jellyfish85.dbaccessor.bean.erd.mainte.tool.MsTablesBean
+import com.jellyfish85.dbaccessor.bean.erd.release.controller.TpTicketNumbers4releaseBean
+import com.jellyfish85.dbaccessor.dao.erd.release.controller.TpTicketNumbers4releaseDao
 import com.jellyfish85.dbaccessor.manager.DatabaseManager
 import com.jellyfish85.erd.release.controller.BaseContext
 import org.dbunit.operation.DatabaseOperation
@@ -26,6 +28,7 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
     String       schemaName     = ""
     IDatabaseConnection iConn   = null
 
+
     @BeforeClass
     void setUp() {
         environment = System.getProperty("environment")
@@ -40,9 +43,7 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
         schemaName  = metaData.getUserName()
 
         iConn   = new DatabaseConnection(conn, schemaName)
-    }
 
-    void testGenerateTarget() {
         String url                   = "/excel/KR_TRKM_STATUS_03.xls"
         File file                    = new File(getClass().getResource(url).toURI())
         FileInputStream inputStream  = new FileInputStream(file)
@@ -65,16 +66,45 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
         DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
         conn.commit()
 
+        url                   = "/excel/MS_ERD_RELEASES_01.xls"
+        file                    = new File(getClass().getResource(url).toURI())
+        inputStream  = new FileInputStream(file)
+        partialDataSet      = new XlsDataSet(inputStream)
+        DatabaseOperation.CLEAN_INSERT.execute(iConn, partialDataSet)
+        conn.commit()
+    }
+
+    void testGenerateTarget() {
         ArrayList<MsTablesBean> targets = register.generateTarget()
 
         assertEquals("array size should be 2", targets.size(), 2)
     }
 
-    /*
-    void testPrepareErdRelease() {
 
+    void testPrepareErdRelease() {
+        register.prepareErdRelease()
+
+        TpTicketNumbers4releaseDao tpDao = new TpTicketNumbers4releaseDao()
+        TpTicketNumbers4releaseBean bean = new TpTicketNumbers4releaseBean()
+        bean.releaseIdAttr().setValue(new BigDecimal(306))
+        bean.trkmIdAttr().setValue(new BigDecimal(2843))
+
+        def _list = tpDao.find(this.conn, bean)
+        ArrayList<TpTicketNumbers4releaseBean> list = tpDao.convert(_list)
+
+        assertEquals("ticket number should be 33367",
+                (new BigDecimal(33367)), list.head().ticketNumberAttr().value())
+
+
+        bean.trkmIdAttr().setValue(new BigDecimal(2841))
+        _list = tpDao.find(this.conn, bean)
+        list = tpDao.convert(_list)
+
+        assertEquals("ticket number should be 33574",
+                (new BigDecimal(33574)), list.head().ticketNumberAttr().value())
     }
 
+    /*
     void testExecuteErdRelease() {
 
     }

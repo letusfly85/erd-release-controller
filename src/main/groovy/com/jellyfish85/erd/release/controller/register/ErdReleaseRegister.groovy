@@ -83,7 +83,7 @@ class ErdReleaseRegister extends ErdRegister {
         return beans
     }
 
-    public void prepareErdRelease() throws SQLException {
+    public void prepareErdRelease() {
 
         BigDecimal preReleaseId = curDao.findMaxReleaseId(this.conn)
         BigDecimal curReleaseId = preReleaseId + new BigDecimal(1)
@@ -104,11 +104,13 @@ class ErdReleaseRegister extends ErdRegister {
             tpBean.ticketNumberAttr().setValue(bean.ticketNumberAttr().value())
             tpBean.trkmIdAttr().setValue(bean.trkmIdAttr().value())
 
+            //todo println release id and trkm id list
+
             tpBeans.add(tpBean)
         }
 
         tpDao.insert(this.conn, tpBeans)
-        this.manager.jCommit()
+        this.conn.commit()
     }
 
     public void executeErdRelease() {
