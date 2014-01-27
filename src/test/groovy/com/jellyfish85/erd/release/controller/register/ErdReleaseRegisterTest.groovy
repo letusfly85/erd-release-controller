@@ -129,10 +129,4 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
         assertEquals("history release id should be 306",
                 (new BigDecimal(306)), result.head().bfReleaseIdAttr().value() )
     }
-
-    /*
-    void testRegister() {
-
-    }
-    */
 }
