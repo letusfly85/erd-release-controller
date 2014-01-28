@@ -8,9 +8,6 @@ import com.jellyfish85.dbaccessor.dao.erd.release.controller.TpTicketNumbers4rel
 import com.jellyfish85.dbaccessor.manager.DatabaseManager
 import com.jellyfish85.erd.release.controller.BaseContext
 import org.dbunit.operation.DatabaseOperation
-import org.junit.AfterClass
-import org.junit.Before
-import org.junit.BeforeClass
 
 import java.sql.Connection
 import java.sql.DatabaseMetaData
@@ -20,9 +17,9 @@ import org.dbunit.database.IDatabaseConnection
 import org.dbunit.dataset.IDataSet
 import org.dbunit.dataset.excel.XlsDataSet
 
-class ErdReleaseRegisterTest extends GroovyTestCase {
+class ErdReleaseTest extends GroovyTestCase {
 
-    ErdReleaseRegister register = null
+    ErdRelease register = null
     String       environment    = null
     BaseContext  context        = null
     DatabaseManager manager     = null
@@ -38,7 +35,7 @@ class ErdReleaseRegisterTest extends GroovyTestCase {
         manager     = context.manager
         conn        = context.conn
 
-        register    = new ErdReleaseRegister(context)
+        register    = new ErdRelease(context)
 
         DatabaseMetaData metaData = conn.getMetaData()
         schemaName  = metaData.getUserName()

@@ -7,7 +7,7 @@ import com.jellyfish85.erd.release.controller.constant.ErdReleaseControllerConst
 
 import java.sql.SQLException
 
-class TrkmStatusRegister extends ErdRegister {
+class TrkmStatusRegister extends GeneralRegister {
 
     private KrTrkmStatusDao dao = new KrTrkmStatusDao()
     private BaseContext context = null

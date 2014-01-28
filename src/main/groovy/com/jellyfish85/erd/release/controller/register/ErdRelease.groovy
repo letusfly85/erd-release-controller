@@ -14,10 +14,8 @@ import com.jellyfish85.erd.release.controller.BaseContext
 import org.apache.commons.lang.ArrayUtils
 
 import java.sql.Connection
-import java.sql.SQLException
 
-
-class ErdReleaseRegister extends ErdRegister {
+class ErdRelease extends GeneralRegister {
 
     private DatabaseManager          manager  = null
     private Connection               conn     = null
@@ -29,7 +27,7 @@ class ErdReleaseRegister extends ErdRegister {
 
 
     private BaseContext context = null
-    public ErdReleaseRegister(BaseContext _context) {
+    public ErdRelease(BaseContext _context) {
         this.context = _context
 
         manager = this.context.manager
