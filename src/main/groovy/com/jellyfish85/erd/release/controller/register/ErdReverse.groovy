@@ -23,6 +23,7 @@ class ErdReverse extends GeneralRegister {
         this.tableDefineNames = _tableDefineNames
     }
 
+    // register erd information to repository
     public void register(){
         //todo get KR_TAB_DEF_REVISIONS entries
 
