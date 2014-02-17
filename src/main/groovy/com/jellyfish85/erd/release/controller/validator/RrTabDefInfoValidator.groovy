@@ -41,4 +41,13 @@ class RrTabDefInfoValidator extends GeneralValidator {
             }
         }
     }
+
+    /**
+     *
+     * @param beans
+     */
+    public void validateYmdColumnDataAttribute(ArrayList<RrTabDefInfoBean> beans) {
+        //todo
+
+    }
 }
