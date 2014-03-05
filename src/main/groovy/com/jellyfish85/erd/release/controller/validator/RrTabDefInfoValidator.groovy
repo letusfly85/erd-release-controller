@@ -43,11 +43,32 @@ class RrTabDefInfoValidator extends GeneralValidator {
     }
 
     /**
+     * validate object type check
+     *
      *
      * @param beans
      */
     public void validateYmdColumnDataAttribute(ArrayList<RrTabDefInfoBean> beans) {
-        //todo
+        HashMap<String, String> ymdMap = new HashMap<>()
 
+        beans.eachWithIndex {RrTabDefInfoBean bean, int index ->
+
+            beans.eachWithIndex {RrTabDefInfoBean _bean, int _index ->
+                if (_bean.physicalColumnNameAttr().value().endsWith("YMD") &&
+                    _bean.dataLengthAttr().value() != "8"
+                    ) {
+                    ymdMap.put(bean.physicalColumnNameAttr().value(), "")
+                }
+            }
+        }
+
+        if (ymdMap.size() > 0) {
+            ymdMap.each {key, value ->
+                RrTabDefInfoValidateBean validateBean = new RrTabDefInfoValidator()
+                validateBean.setResults(false, key)
+
+                validateBeans.add(validateBean)
+            }
+        }
     }
 }
